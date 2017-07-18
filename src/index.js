@@ -9,8 +9,6 @@ import App from './components/App';
 import Home from './components/views/Home/Home';
 import configureStore from './stores/configureStore';
 import './style/app.css';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/css/bootstrap-theme.css';
 const store = configureStore();
 const history = syncHistoryWithStore(browserHistory, store);
 
