@@ -1,4 +1,2 @@
-const main = (state = {}, action) => {
-  return state;
-}
+const main = (state = {}, action) => state;
 module.exports = main;
