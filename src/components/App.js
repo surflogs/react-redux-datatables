@@ -1,10 +1,9 @@
 import React from 'react';
-
+import ReactDatatable from './react-redux-datatable'
 const App = ({ children }) => (
   <div>
-    <div className="container">
       {children}
-    </div>
+      <ReactDatatable />
   </div>
 );
 

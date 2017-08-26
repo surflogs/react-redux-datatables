@@ -9,9 +9,12 @@ import * as actions from '../actions/react-datatable-action';
 
 class ReactDatatable extends Component {
   componentWillMount() {
-    this.props.fetchSKUDataAction();
+    // this.props.fetchSKUDataAction();
+    this.props.setNewPageNumberAction(1);
+    this.props.setNewPageSizeAction(10);
     this.props.fetchHeadersAction();
-    // this.props.fetchPmDataAction();
+    this.props.setTotalNumberOfRecords();
+    this.props.fetchLmDataAction(1, 10);
   }
 
   render() {
@@ -30,12 +33,13 @@ class ReactDatatable extends Component {
     }
 
     return (
-        <Table>
+        <Table striped bordered condensed hover height='10px' width='90%'>
           <Headers headerConfig={this.props.headers}/>
           <Rows data={rows}/>
             <tr>
-              <td><PaginationDatatable/></td>
+              <td colSpan="5"><PaginationDatatable/></td>
               <td></td>
+              <td>Showing {((this.props.activePage - 1)  * this.props.pageSize) + 1} to {(((this.props.activePage - 1)  * this.props.pageSize)) + (this.props.rows ? this.props.rows.length : 0)} of { this.props.totalRecords } entries</td>
               <td></td>
               <td><PageSizeDatatable page={pages}/></td>
             </tr>
@@ -49,14 +53,20 @@ class ReactDatatable extends Component {
 const mapStateToProps = (state) => {
   return {
     headers : state.datatable.headers,
-    rows : state.datatable.rows
+    rows : state.datatable.rows,
+    activePage : state.datatable.page,
+    pageSize : state.datatable.pageSize,
+    totalRecords : state.datatable.totalRecords
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchSKUDataAction :(skuname) => { dispatch(actions.fetchSKUDataAction(skuname)); },
-    fetchPmDataAction : () => { dispatch(actions.fetchPmDataAction()); },
-    fetchHeadersAction : () => { dispatch(actions.fetchHeadersAction()); }
+    fetchLmDataAction : (page, limit) => { dispatch(actions.fetchLmDataAction(page, limit)); },
+    fetchHeadersAction : () => { dispatch(actions.fetchHeadersAction()); },
+    setTotalNumberOfRecords : () => { dispatch(actions.setTotalNumberOfRecords()); },
+    setNewPageNumberAction :(pageno) => { dispatch(actions.setNewPageNumberAction(pageno)); },
+    setNewPageSizeAction :(pageSize) => { dispatch(actions.setNewPageSizeAction(pageSize)); }
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ReactDatatable);

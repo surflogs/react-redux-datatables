@@ -6,7 +6,7 @@ export default (state = [], action) => {
         ...state,
         rows : action.purchaseSKUs
       };
-    case 'PM_DATA':
+    case 'LM_DATA':
       return {
         ...state,
         rows : action.pmdata
@@ -30,6 +30,21 @@ export default (state = [], action) => {
       return {
         ...state,
         modalState : action.payload
+      };
+    case 'TOTAL_RECORDS':
+      return {
+        ...state,
+        totalRecords : action.payload
+      };
+    case 'SORT_COLUMN':
+      return {
+        ...state,
+        sortColumn : action.payload
+      };
+    case 'SORT_ORDER':
+      return {
+        ...state,
+        sortOrder : action.payload
       };
     default:
       return state;

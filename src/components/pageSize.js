@@ -5,9 +5,14 @@ import * as actions from '../actions/react-datatable-action';
 
 class PageSizeDatatable extends Component{
 
+  // componentWillMount() {
+  //   this.props.setNewPageSizeAction(this.props.page[0])
+  // }
+
   handleSelect(eventKey, event) {
     console.log(eventKey);
     this.props.setNewPageSizeAction(eventKey);
+    this.props.fetchLmDataAction(this.props.activePage, eventKey)
   }
   render() {
 
@@ -17,11 +22,13 @@ class PageSizeDatatable extends Component{
     }
 
     const options = [];
-    this.props.page.map((singlePage) => {
-      options.push(<MenuItem eventKey= { singlePage } > { singlePage } </MenuItem>);
-    });
+    if (this.props.page){
+      this.props.page.map((singlePage) => {
+        options.push(<MenuItem key= {singlePage} eventKey= { singlePage } > { singlePage } </MenuItem>);
+      });
+    }
     return (
-      <DropdownButton bsSize="large" title={ title } onSelect={this.handleSelect.bind(this)}>
+      <DropdownButton id ='pagesizeDropdown' bsSize="large" title={ title } onSelect={this.handleSelect.bind(this)}>
         {options}
       </DropdownButton>
     );
@@ -30,13 +37,15 @@ class PageSizeDatatable extends Component{
 
 const mapStateToProps = (state) => {
   return {
-    pageSize : state.datatable.pageSize
+    pageSize : state.datatable.pageSize,
+    activePage : state.datatable.page
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setNewPageSizeAction :(pageSize) => { dispatch(actions.setNewPageSizeAction(pageSize)); }
+    setNewPageSizeAction :(pageSize) => { dispatch(actions.setNewPageSizeAction(pageSize)); },
+    fetchLmDataAction : (page, limit) => { dispatch(actions.fetchLmDataAction(page, limit)); },
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(PageSizeDatatable);

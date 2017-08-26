@@ -1,4 +1,4 @@
-import { getSkuDetailFromPM, GET_PM_DATA_API, GET_LM_HEADERS_API } from '../apis/react-datatable-apis';
+import { getSkuDetailFromPM, GET_LM_DATA_API, GET_LM_HEADERS_API, GET_LM_TOTAL_RECORDS_API } from '../apis/react-datatable-apis';
 
 function loadSkuData(allSKUs) {
   return {
@@ -19,17 +19,17 @@ function fetchSKUDataAction() {
 }
 
 
-function loadPMData(alldata) {
+function loadLMData(alldata) {
   return {
-    type : 'PM_DATA',
+    type : 'LM_DATA',
     pmdata : alldata
   };
 }
-function fetchPmDataAction() {
+function fetchLmDataAction(page, limit, sortData) {
   console.log('PM_DATA');
   return function(dispatch) {
-    return GET_PM_DATA_API().then((response) => {
-      dispatch(loadPMData(response));
+    return GET_LM_DATA_API(page, limit, sortData).then((response) => {
+      dispatch(loadLMData(response));
     }).catch((error) => {
       throw (error);
     });
@@ -75,11 +75,47 @@ function setShowModalStateAction(modalState) {
   };
 }
 
+function loadTotalNumberOfRecords(total) {
+  console.log("this is count to be" + total);
+  return {
+    type : 'TOTAL_RECORDS',
+    payload : total
+  };
+}
+
+function setTotalNumberOfRecords() {
+  console.log(" here in action");
+  return function(dispatch) {
+    return GET_LM_TOTAL_RECORDS_API().then((response) => {
+      dispatch(loadTotalNumberOfRecords(response));
+    }).catch((error) => {
+      throw (error);
+    });
+  };
+}
+
+function setSortColumnStateAction(column) {
+  return {
+    type : 'SORT_COLUMN',
+    payload : column
+  };
+}
+
+function setSortOrderStateAction(order) {
+  return {
+    type : 'SORT_ORDER',
+    payload : order
+  };
+}
+
 export {
   fetchSKUDataAction,
-  fetchPmDataAction,
+  fetchLmDataAction,
   setNewPageNumberAction,
   fetchHeadersAction,
   setNewPageSizeAction,
-  setShowModalStateAction
+  setShowModalStateAction,
+  setTotalNumberOfRecords,
+  setSortColumnStateAction,
+  setSortOrderStateAction
 };

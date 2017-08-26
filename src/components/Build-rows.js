@@ -1,8 +1,26 @@
 import React, { Component } from 'react';
-import { Modal, Button } from 'react-bootstrap';
 import { connect } from 'react-redux';
-import ModalDatatable from './partialComponents/modal';
+import { FormControl } from 'react-bootstrap';
 import * as actions from '../actions/react-datatable-action';
+import * as components from '../components/partialComponents/index';
+// import inputBoxQty from '../components/partialComponents/inputBoxQty'
+import ModalDatatable from '../components/partialComponents/modal';
+
+function mapCellTypeToComponent(Component, val) {
+  let c;
+  switch (Component) {
+    case 'inputBoxQty':
+      c = <FormControl type="text" value={val}/>;
+      break;
+    case 'modal':
+      c = <ModalDatatable />;
+      break;
+    default:
+      c = 'not able to find matching component';
+      break;
+  }
+  return c;
+}
 
 class Rows extends Component {
   render() {
@@ -13,7 +31,12 @@ class Rows extends Component {
       this.props.data.map((singleRow) => {
         let td = [];
         this.props.header.map((singleTD) => {
-          td.push(<td>{singleRow[singleTD.dbfeild]}</td>);
+          if (singleTD.celltype === 'Component') {
+            td.push(<td>{mapCellTypeToComponent(singleTD.cellvalue, singleRow[singleTD.dbfeild])}</td>);
+            // td.push(<td><inputBoxQty /></td>);
+          } else {
+            td.push(<td>{singleRow[singleTD.dbfeild]}</td>);
+          }
         });
 
         rows.push(<tr>{ td }</tr>);
