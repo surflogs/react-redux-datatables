@@ -12,8 +12,15 @@ const getSkuDetailFromPM = (skuname) => {
 const GET_LM_HEADERS_API = () => {
   console.log(getListingHeaders);
   return fetch(getListingHeaders,
-    { method: 'GET',
+    { method: 'POST',
       mode: 'cors',
+      body: JSON.stringify({
+        clientid:'394',
+        dtname : 'productmaster'
+      }),
+      headers: {
+        'content-type' : 'application/json; charset=utf-8'
+      },
       cache: 'default' }).then((response) => {
         return response.json();
       }).catch((error) => {
@@ -21,30 +28,39 @@ const GET_LM_HEADERS_API = () => {
       });
 };
 
-const GET_LM_TOTAL_RECORDS_API = () => {
+const GET_LM_TOTAL_RECORDS_API = (filters = '{}') => {
   return fetch(getTotalRecordsListingMaster,
-    { method: 'GET',
+    { method: 'POST',
       mode: 'cors',
-      cache: 'default' }).then((response) => {
-        return response.json();
-      }).catch((error) => {
-        return error;
-      });
+      body: JSON.stringify({
+        clientid:'394',
+        filter:filters
+      }),
+      headers: {
+        'content-type' : 'application/json; charset=utf-8'
+      },
+      cache: 'default'
+    }).then((response) => {
+      return response.json();
+    }).catch((error) => {
+      return error;
+    });
 };
 
-const GET_PM_DATA_API = () => {
-  return fetch('http://myexpress-wa.azurewebsites.net/pmdata',
+const GET_LM_DATA_API = (pageNo, limitReco, sortField = '{"afid" : 1}', filters = '{}') => {
+  console.log(JSON.stringify({
+    clientid:'396',
+    page:pageNo,
+    limit:limitReco
+  }));
+  return fetch('http://node-demo-wa.azurewebsites.net/pm/pmdata',
     {
       method : 'POST',
       mode : 'cors',
       body: JSON.stringify({
         clientid:'396',
-        systemmode:'pm',
-        term:'wh',
-        shipmode:'pm',
-        page:0,
-        skip:5,
-        search:''
+        page:pageNo,
+        limit:limitReco
       }),
       headers: {
         'content-type' : 'application/json; charset=utf-8'
@@ -56,8 +72,8 @@ const GET_PM_DATA_API = () => {
     });
 };
 
-const GET_LM_DATA_API = (pageNo, limitReco, sortField = '{"afid" : 1}') => {
-  console.log(" pageNo " + pageNo + " limitReco " + limitReco + " sort fields " + sortField); 
+const GET_PM_DATA_API = (pageNo, limitReco, sortField = '{"afid" : 1}', filters='{}') => {
+  console.log(" pageNo " + pageNo + " limitReco " + limitReco + " sort fields " + sortField + " filter " );
   return fetch(getListingRowData,
     {
       method : 'POST',
@@ -66,7 +82,8 @@ const GET_LM_DATA_API = (pageNo, limitReco, sortField = '{"afid" : 1}') => {
         clientid:'394',
         page:pageNo,
         limit:limitReco,
-        sort : sortField
+        sort : sortField,
+        filter : filters
       }),
       headers: {
         'content-type' : 'application/json; charset=utf-8'
