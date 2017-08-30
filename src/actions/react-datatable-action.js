@@ -25,10 +25,10 @@ function loadLMData(alldata) {
     pmdata : alldata
   };
 }
-function fetchLmDataAction(page, limit, sortData) {
+function fetchLmDataAction(page, limit, sortData, filter) {
   console.log('PM_DATA');
   return function(dispatch) {
-    return GET_LM_DATA_API(page, limit, sortData).then((response) => {
+    return GET_LM_DATA_API(page, limit, sortData, filter).then((response) => {
       dispatch(loadLMData(response));
     }).catch((error) => {
       throw (error);
@@ -76,17 +76,17 @@ function setShowModalStateAction(modalState) {
 }
 
 function loadTotalNumberOfRecords(total) {
-  console.log("this is count to be" + total);
+  console.log("this is count to be" + JSON.stringify(total));
   return {
     type : 'TOTAL_RECORDS',
     payload : total
   };
 }
 
-function setTotalNumberOfRecords() {
+function setTotalNumberOfRecords(filter) {
   console.log(" here in action");
   return function(dispatch) {
-    return GET_LM_TOTAL_RECORDS_API().then((response) => {
+    return GET_LM_TOTAL_RECORDS_API(filter).then((response) => {
       dispatch(loadTotalNumberOfRecords(response));
     }).catch((error) => {
       throw (error);
@@ -108,6 +108,13 @@ function setSortOrderStateAction(order) {
   };
 }
 
+function setNewFilterAction(filters) {
+  return {
+    type : 'FILTERS',
+    payload : filters
+  };
+}
+
 export {
   fetchSKUDataAction,
   fetchLmDataAction,
@@ -117,5 +124,6 @@ export {
   setShowModalStateAction,
   setTotalNumberOfRecords,
   setSortColumnStateAction,
-  setSortOrderStateAction
+  setSortOrderStateAction,
+  setNewFilterAction
 };

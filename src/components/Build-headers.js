@@ -6,17 +6,23 @@ import * as actions from '../actions/react-datatable-action';
 import DropDownFilterDatatable from './partialComponents/dropdownFilter';
 import NumberFilterDatatable from '../components/partialComponents/numberFilter';
 
-function mapCellTypeToComponent(Component, val, id, handler) {
+const txtBox = {
+  background : 'white',
+  width : '50%',
+  height : '60px'
+};
+
+function mapCellTypeToComponent(Component, val, id, handler, text) {
   let c;
   switch (Component) {
     case 'dropdown':
-      c = <DropDownFilterDatatable keyData={id} onClick={ handler }/>;
+      c = <DropDownFilterDatatable keyData={id} title={text} menuItems={val} onClick={ handler }/>;
       break;
     case 'textbox':
-      c = <FormControl className="form-control" type="text" keyData={id} onBlur={ handler } />;
+      c = <FormControl id={id} style={txtBox} title={text} className="form-control" type="text" onBlur={ handler } />;
       break;
     case 'number':
-      c = <NumberFilterDatatable keyData={id} onBlur={ handler } />;
+      c = <NumberFilterDatatable keyData={id} title={text} onBlur={ handler } />;
       break;
     default:
       c = '';
@@ -31,31 +37,78 @@ class Headers extends Component {
     console.log(" called now ... ");
     const sortData = {};
     sortData[columnName] = order;
-    console.log(JSON.stringify(sortData));
-    this.props.fetchLmDataAction(this.props.activePage, this.props.pageSize, JSON.stringify(sortData));
+    const filter = {}
+    this.props.fetchLmDataAction(this.props.activePage, this.props.pageSize, JSON.stringify(sortData), JSON.stringify(this.props.filters  ));
   }
 
   onSelect(eventKey, event) {
-    const filter = {};
-    filter[event.target.id] = eventKey;
-    console.log(eventKey);
-    console.log(JSON.stringify(filter));
+    const field = event.target.id;
+    const value = eventKey;
     // this.props.fetchLmDataAction(1, this.props.pageSize, JSON.stringify(filter));
-    // this.props.setNewFilter(filter);
+    // this.props.setNewFilterAction(filter);
+    this.addFilterToState(field, value);
   }
 
-  onBlurOfTextBox(event) {
-    console.log(event);
-    console.log(event.target.id);
-    console.log(event.target.value);
+  addFilterToState(field, value) {
+    let filter = {};
+    if (this.props.filters) {
+      filter = this.props.filters;
+    }
+    if (value.length > 0) {
+      filter[field] = value;
+      this.props.setNewFilterAction(filter);
+    }
+    const orderBy = {};
+    if (this.props.sortColumn) {
+      orderBy[this.props.sortColumn] = this.props.sortOrder;
+    }
 
+    filter[field] = value;
+    this.props.fetchLmDataAction(this.props.activePage, this.props.pageSize, JSON.stringify(orderBy), JSON.stringify(filter));
+    this.props.setTotalNumberOfRecords(JSON.stringify(filter));
+  }
+
+  onBlurOfTextBox(event, eventKey) {
+    let field;
+    let value;
+    let allFilters = {};
+    if (this.props.filters) {
+      allFilters = this.props.filters;
+    }
+    if (eventKey.target.id.length > 0) { // for dropdown in filter
+      field = eventKey.target.id;
+      value = event;
+      if (value.length === 0) {
+        console.log(" value is empty ");
+        if (allFilters.hasOwnProperty(field)) {
+          console.log(" removing key ");
+          delete allFilters[field];
+          // console.log(JSON.stringify(allFilters));
+          this.props.setNewFilterAction(allFilters)
+        }
+      }
+      this.addFilterToState(field, value);
+    } else { // for textbox in filter
+      field = event.target.id;
+      value = event.target.value;
+      if (value.length === 0) {
+        console.log(" value is empty ");
+        if (allFilters.hasOwnProperty(field)) {
+          console.log(" removing key ");
+          delete allFilters[field];
+          this.props.setNewFilterAction(allFilters)
+
+          // console.log(JSON.stringify(allFilters));
+        }
+      }
+      this.addFilterToState(field, value);
+    }
   }
 
   bindDbHandlerToHandler(handlerName) {
     let c;
     switch (handlerName) {
       case 'onSelect':
-        console.log(' in proper case');
         c = this.onSelect.bind(this);
         break;
       case 'onBlurOfTextBox':
@@ -69,22 +122,22 @@ class Headers extends Component {
   }
 
   sort(name, event) {
-    console.log(name.target.id);
     if (this.props.sortColumn) {
       if (this.props.sortColumn === name.target.id) {
-        console.log(" decending... ");
         this.props.setSortColumnStateAction(name.target.id);
-        this.props.setSortOrderStateAction(-1);
-
-        this.fillData(name.target.id, -1);
+        if (this.props.sortOrder === -1) {
+          this.props.setSortOrderStateAction(1);
+          this.fillData(name.target.id, 1);
+        } else {
+          this.props.setSortOrderStateAction(-1);
+          this.fillData(name.target.id, -1);
+        }
       } else {
-        console.log(" alag column ascending... ");
         this.props.setSortColumnStateAction(name.target.id);
         this.props.setSortOrderStateAction(1);
         this.fillData(name.target.id, 1);
       }
     } else {
-      console.log(" first time ");
       this.props.setSortColumnStateAction(name.target.id);
       Promise.resolve(this.props.setSortOrderStateAction(1)).then(
         this.fillData(name.target.id, 1)
@@ -97,11 +150,9 @@ class Headers extends Component {
     const filters = [];
     if (this.props.headerConfig) {
       this.props.headerConfig.map((header) => {
-        console.log(header.handler);
         const handler = this.bindDbHandlerToHandler(header.handler);
-        console.log(handler + " this is handler");
         headers.push(<th key = {header.dbfeild} id={header.dbfeild}>{header.headername}</th>);
-        filters.push(<th key = {header.dbfeild} id={header.dbfeild}> {mapCellTypeToComponent(header.filtertype, header.filtervalue, header.dbfeild, handler)} </th>);
+        filters.push(<th key = {header.dbfeild} id={header.dbfeild}> {mapCellTypeToComponent(header.filtertype, header.filtervalue, header.dbfeild, handler, header.headername)} </th>);
       });
     }
 
@@ -122,7 +173,8 @@ const mapStateToProps = (state) => {
     sortColumn : state.datatable.sortColumn,
     sortOrder : state.datatable.sortOrder,
     activePage : state.datatable.page,
-    pageSize : state.datatable.pageSize
+    pageSize : state.datatable.pageSize,
+    filters : state.datatable.filters
   };
 };
 
@@ -130,7 +182,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setSortOrderStateAction :(order) => { dispatch(actions.setSortOrderStateAction(order)); },
     setSortColumnStateAction :(column) => { dispatch(actions.setSortColumnStateAction(column)); },
-    fetchLmDataAction : (page, limit, sortField) => { dispatch(actions.fetchLmDataAction(page, limit, sortField)); }
+    fetchLmDataAction : (page, limit, sortField, filter) => { dispatch(actions.fetchLmDataAction(page, limit, sortField, filter)); },
+    setNewFilterAction : (filters) => { dispatch(actions.setNewFilterAction(filters)); },
+    setTotalNumberOfRecords : (filter) => { dispatch(actions.setTotalNumberOfRecords(filter)); }
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Headers);

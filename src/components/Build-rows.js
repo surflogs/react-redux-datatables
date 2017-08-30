@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { FormControl } from 'react-bootstrap';
+import { FormControl, tbody } from 'react-bootstrap';
 import * as actions from '../actions/react-datatable-action';
 import * as components from '../components/partialComponents/index';
 // import inputBoxQty from '../components/partialComponents/inputBoxQty'
 import ModalDatatable from '../components/partialComponents/modal';
+import ExpandCollapse from '../components/partialComponents/expandCollapse';
 
-function mapCellTypeToComponent(Component, val) {
+function mapCellTypeToComponent(Component, val, dataTosend, trigger) {
   let c;
   switch (Component) {
     case 'inputBoxQty':
@@ -14,6 +15,10 @@ function mapCellTypeToComponent(Component, val) {
       break;
     case 'modal':
       c = <ModalDatatable />;
+      break;
+    case 'expandable':
+      console.log(" sending this data to component" + dataTosend);
+      c = <ExpandCollapse data={ dataTosend } triggerData={trigger}/>;
       break;
     default:
       c = 'not able to find matching component';
@@ -23,23 +28,23 @@ function mapCellTypeToComponent(Component, val) {
 }
 
 class Rows extends Component {
+
   render() {
     const rows = [];
     if (this.props.data.length === 0) {
-      rows.push(<tr><td> No records Found </td></tr>);
+      rows.push(<tr key="empty"><td> No records Found </td></tr>);
     } else {
       this.props.data.map((singleRow) => {
-        let td = [];
+        const td = [];
         this.props.header.map((singleTD) => {
           if (singleTD.celltype === 'Component') {
-            td.push(<td>{mapCellTypeToComponent(singleTD.cellvalue, singleRow[singleTD.dbfeild])}</td>);
-            // td.push(<td><inputBoxQty /></td>);
+            td.push(<td>{mapCellTypeToComponent(singleTD.cellvalue, singleRow[singleTD.dbfeild], singleRow.bundeldetail, singleRow.sku)}</td>);
           } else {
             td.push(<td>{singleRow[singleTD.dbfeild]}</td>);
           }
         });
 
-        rows.push(<tr>{ td }</tr>);
+        rows.push(<tr id={singleRow.dbfeild}>{ td }</tr>);
       });
     }
     return (

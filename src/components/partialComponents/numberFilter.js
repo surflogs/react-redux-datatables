@@ -37,10 +37,10 @@ class NumberFilterDatatable extends Component {
     return (
       <div>
         <div>
-        <DropdownButton key={this.props.key} bsSize='large' title='Operator' >
+        <DropdownButton onSelect={this.props.onBlur.bind(this)} key={this.props.key} bsSize='large' title='Operator' >
           {options}
         </DropdownButton>
-        <FormControl onBlur={this.props.onBlur.bind(this)} style={txtBox} id={this.props.keyData} className="form-control" type="text" />
+        <FormControl onBlur={this.props.onBlur.bind(this)} style={txtBox} id={this.props.keyData + 'txtbox'} className="form-control" type="text" />
         </div>
         <div>
 

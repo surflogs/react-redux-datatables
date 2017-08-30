@@ -10,17 +10,21 @@ import * as actions from '../actions/react-datatable-action';
 class ReactDatatable extends Component {
   componentWillMount() {
     // this.props.fetchSKUDataAction();
+    const filter = {};
     this.props.setNewPageNumberAction(1);
     this.props.setNewPageSizeAction(10);
     this.props.fetchHeadersAction();
-    this.props.setTotalNumberOfRecords();
-    this.props.fetchLmDataAction(1, 10);
+    this.props.setTotalNumberOfRecords(JSON.stringify(filter));
+    const orderBy= {};
+    orderBy['chid']= 1;
+
+    this.props.fetchLmDataAction(1, 10, JSON.stringify(orderBy));
   }
 
   render() {
     let rows = [];
     if (this.props.rows) {
-      rows = this.props.rows;
+      rows = this.props.rows.respData;
     } else {
       rows = [];
     }
@@ -36,15 +40,17 @@ class ReactDatatable extends Component {
         <Table striped bordered condensed hover height='10px' width='90%'>
           <Headers headerConfig={this.props.headers}/>
           <Rows data={rows}/>
-            <tr>
+          <tbody>
+            <tr id="footer">
               <td colSpan="5"><PaginationDatatable/></td>
               <td></td>
-              <td>Showing {((this.props.activePage - 1)  * this.props.pageSize) + 1} to {(((this.props.activePage - 1)  * this.props.pageSize)) + (this.props.rows ? this.props.rows.length : 0)} of { this.props.totalRecords } entries</td>
+              <td>Showing {((this.props.activePage - 1)  * this.props.pageSize) + 1} to {(((this.props.activePage - 1)  * this.props.pageSize)) + (this.props.rows ? rows.length : 0)} of { this.props.totalRecords } entries</td>
+              <td></td>
+              <td></td>
               <td></td>
               <td><PageSizeDatatable page={pages}/></td>
             </tr>
-
-
+          </tbody>
       </Table>
     );
   }
@@ -62,9 +68,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     fetchSKUDataAction :(skuname) => { dispatch(actions.fetchSKUDataAction(skuname)); },
-    fetchLmDataAction : (page, limit) => { dispatch(actions.fetchLmDataAction(page, limit)); },
+    fetchLmDataAction : (page, limit, orderBy) => { dispatch(actions.fetchLmDataAction(page, limit, orderBy)); },
     fetchHeadersAction : () => { dispatch(actions.fetchHeadersAction()); },
-    setTotalNumberOfRecords : () => { dispatch(actions.setTotalNumberOfRecords()); },
+    setTotalNumberOfRecords : (filter) => { dispatch(actions.setTotalNumberOfRecords(filter)); },
     setNewPageNumberAction :(pageno) => { dispatch(actions.setNewPageNumberAction(pageno)); },
     setNewPageSizeAction :(pageSize) => { dispatch(actions.setNewPageSizeAction(pageSize)); }
   };

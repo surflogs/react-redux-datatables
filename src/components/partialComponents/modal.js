@@ -33,21 +33,23 @@ class ModalDatatable extends Component {
     Launch demo modal
   </Button>
   { this.props.modalState ?
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <Modal.Dialog show={status} onHide={this.close} >
-        <Modal.Header>
+        <Modal.Header className="modal-header">
           <Modal.Title>Modal title</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>
+        <Modal.Body className="modal-body">
           One fine body...
         </Modal.Body>
 
-        <Modal.Footer>
+        <Modal.Footer className="modal-footer">
           <Button onClick={this.close.bind(this)}>Close</Button>
           <Button bsStyle="primary">Save changes</Button>
         </Modal.Footer>
 
       </Modal.Dialog>
+    </div>
       : '' }
       </div>
     );

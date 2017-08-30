@@ -46,6 +46,11 @@ export default (state = [], action) => {
         ...state,
         sortOrder : action.payload
       };
+    case 'FILTERS':
+      return {
+        ...state,
+        filters : action.payload
+      };
     default:
       return state;
   }

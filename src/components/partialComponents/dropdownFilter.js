@@ -3,27 +3,26 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import * as actions from '../../actions/react-datatable-action';
 
-const menuItems = [{
-  viewName : 'Amazon VOI',
-  value : '17'
-},
-{
-  viewName : 'Amazon',
-  value : '8'
-}];
-
 class DropDownFilterDatatable extends Component {
 
   render() {
-
+    let title = '';
+    if (this.props.title) {
+      title = this.props.title;
+    }
     const options = [];
-    menuItems.map((singleOption) => {
-      options.push(<MenuItem id={this.props.keyData} key={singleOption.value} eventKey={singleOption.value}>{singleOption.viewName}</MenuItem>);
-    });
-
+    for (const key in this.props.menuItems) {
+      if (this.props.filters) {
+        if (key === this.props.filters[this.props.keyData]) {
+          title = this.props.menuItems[key];
+        }
+      }
+      options.push(<MenuItem id={this.props.keyData} key={key} eventKey={key}>{this.props.menuItems[key]}</MenuItem>);
+    }
+    console.log(title);
     return (
       <div>
-        <DropdownButton onSelect={this.props.onClick.bind(this)} key={this.props.key} bsSize='large' title='ChannelId' >
+        <DropdownButton onSelect={this.props.onClick.bind(this)} key={this.props.key} bsSize='large' title={title} >
           {options}
         </DropdownButton>
       </div>
